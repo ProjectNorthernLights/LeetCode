@@ -1,47 +1,69 @@
 class Solution {
 public:
     
-    void permuteHelper(string &input, string &result, set<string> m, string &chosen )
+    void permuteHelper(string &input, vector<string> &m, string &chosen)
     {
       if( input.empty())
       {
          //base insert int a set
-         m.insert(chosen);
+         m.push_back(chosen);
       }
       else
       {
-       //choose
         for(int i = 0; i < input.length(); i ++)
         {
-          char c = input(i);
+          //choose
+          char c = input[i];
           chosen = chosen + c;
+          input.erase(i,1);
             
           //explore
-          permuteHelper(input, result, m, chosen);
+          permuteHelper(input, m, chosen);
             
           //backtrack
           chosen.erase(chosen.length()-1,1);
           input.insert(i,1,c);
         }
-         
       }
+      return;
     }
     
     
     string getPermutation(int n, int k) 
     {
       string result ;
-      string chosen;
+      string chosen ;
         
-      string input_str;
+      string inputstr ;
         
-      set<string> m;
+      vector<string> m;
       
-      for(int i = 1; i < n; i++)
+      //Convert the n into a string "123.."
+      for(int i = 1; i <= n; i++)
       {
         inputstr= inputstr + to_string(i);
       }
         
-      permuteHelper(inputstr, result, m);
+      //call the helper
+      permuteHelper(inputstr, m, chosen);
+      
+      //now iterate to the kth position 
+      for(vector<string>:: iterator itr = m.begin();
+          itr < m.end();
+          itr++, k--)
+      {
+        if(k == 1)
+        {
+          result = *itr;
+          return result;
+        }
+        // take care if k runs 
+        else if( k == 0)
+        {
+          break;
+        }
+      }
+      
+      return result;
     }
 };
