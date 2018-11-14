@@ -1,0 +1,47 @@
+class Solution {
+public:
+    
+    void permuteHelper(string &input, string &result, set<string> m, string &chosen )
+    {
+      if( input.empty())
+      {
+         //base insert int a set
+         m.insert(chosen);
+      }
+      else
+      {
+       //choose
+        for(int i = 0; i < input.length(); i ++)
+        {
+          char c = input(i);
+          chosen = chosen + c;
+            
+          //explore
+          permuteHelper(input, result, m, chosen);
+            
+          //backtrack
+          chosen.erase(chosen.length()-1,1);
+          input.insert(i,1,c);
+        }
+         
+      }
+    }
+    
+    
+    string getPermutation(int n, int k) 
+    {
+      string result ;
+      string chosen;
+        
+      string input_str;
+        
+      set<string> m;
+      
+      for(int i = 1; i < n; i++)
+      {
+        inputstr= inputstr + to_string(i);
+      }
+        
+      permuteHelper(inputstr, result, m);
+    }
+};
