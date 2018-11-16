@@ -46,24 +46,54 @@ private:
       temp->endOfWord = true;
   }
     
-  void searchHelper(TrieNode *root, string &word){
+  bool searchHelper(TrieNode *root, string word)
+  {
       TrieNode *temp = root;
       map<char, TrieNode*> :: iterator itr;
+    
+      if(word.empty())
+      {
+        if(temp->endOfWord)
+          return true;
+        else
+          return false;
+      }
+    
       for(int i =0; i < word.length(); i++)
       {
-          char c =  word[i];
-          if( c == '.'){
-              if(temp->m.size() != 0){
-                  temp
-              }
-          }
+        //choose
+        char c =  word[i];
+        
+        if(c == '.')
+        {
+          for(int j = 97; j < 26; j++)
+          {
+            if(temp->m[(char)j])
+            {
+              //choose
+              string old_word = word;
+              word = word.substr(i+1);
               
-          itr = temp->m.find(c);
-          
-          if(itr == temp->m.end()){
-              return false;
+              //explore
+              if(searchHelper(temp->m[(char)j], word))
+                return true;
+                 
+              //backtrack
+              word = old_word;
+            }
           }
-          temp = temp->m[c];
+        }
+        else
+        {
+          itr = temp->m.find(c);
+          if(itr == temp->m.end())
+          {
+            return false;
+          }else
+          {
+            temp = temp->m[c];
+          }
+        }
       }
       return temp->endOfWord;
   }
