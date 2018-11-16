@@ -47,7 +47,7 @@ private:
   }
     
   bool searchHelper(TrieNode *root, string word)
-  {
+  {   
       TrieNode *temp = root;
       map<char, TrieNode*> :: iterator itr;
     
@@ -66,8 +66,9 @@ private:
         
         if(c == '.')
         {
-          for(int j = 97; j < 26; j++)
-          {
+          //ASCII a is 97 , so on..
+          for(int j = 97; j < 123; j++)
+          {  
             if(temp->m[(char)j])
             {
               //choose
@@ -82,6 +83,10 @@ private:
               word = old_word;
             }
           }
+        
+          //if after all possible children have been explored, still
+          //true is not returned, then return false
+          return false;
         }
         else
         {
@@ -95,7 +100,7 @@ private:
           }
         }
       }
-      return temp->endOfWord;
+      return temp->endOfWord ;
   }
 };
 
