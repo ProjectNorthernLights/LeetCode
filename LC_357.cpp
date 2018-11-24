@@ -1,47 +1,51 @@
-//Below naive implementation shows TLE for n > 7. Need to come up with a better way
+
 
 class Solution {
 public:
-  
-  bool isUnique(int number, vector<bool> &visited )
-  {
-    //base condition
-    if( number == 0)
-      return true;
-    else
-    {
-      //mark the most significant digit as visited
-      int msd = number % 10;
     
-      //i.e digit is already visited or "seen"
-      if(visited[msd] == true)
-        return false;
+    int countHelper(int n, vector<bool> &visited , int begin)
+    {
+      if(begin == n)
+      {
+        return 1;
+      }
       else
-        visited[msd] = true;
-    
-      number = number /10;
-      
-      return isUnique(number, visited);  
+      {
+        // initialize count to be 1, because the prefix number itself can be a valid target number.
+        int cnt = 1; 
+        
+        for(int i = (begin == 0) ? 1 : 0; i < 10 ; i ++)
+        {
+          //explore only if its safe
+          if(visited[i] == false)
+          {
+            //choose
+            visited[i] = true;
+            
+            //explore
+            cnt = cnt + countHelper(n, visited, begin + 1);
+          
+            //backtrack    
+            visited[i] = false;
+          }
+        }
+        
+        return cnt ; 
+      }
     }
-  }
   
-  int countHelper(int num)
-  {
-    int isUniqueCount = 0;
-    
-    for(int i = 0; i < num; i ++)
+    int countNumbersWithUniqueDigits(int n)
     {
-      vector<bool> visited(10, false);
       
-      //for each i in nums, check if its unique
-      if(isUnique(i, visited))
-        isUniqueCount ++;
-    }
-    return isUniqueCount;
-  }
-  
-  
-    int countNumbersWithUniqueDigits(int n) {
-        return countHelper(pow(10,n));
+      vector<bool> visited(10, false);
+      int begin = 0;
+        
+      //with 10 unique digits, you can form only a 10 digit number
+      //so anything above 10 has to be set to n = 10, because they cannot
+      //return any unique numbers
+      if(n > 10)
+        n = 10;
+      
+      return countHelper(n, visited, begin);
     }
 };
