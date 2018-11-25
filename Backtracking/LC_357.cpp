@@ -1,4 +1,10 @@
+/*
+Update : FOllow this youtube tutorial which solves this problem
+with a bit of combinatorics knowledge.
 
+https://www.youtube.com/watch?v=OkJKxoDbQ_c 
+
+*/
 
 class Solution {
 public:
