@@ -13,36 +13,30 @@
  *  3    4     5      6
  *
  *
- *Output:
-Initializing 7 number of edges
-Adding edge between 0 and 1
-Adding edge between 0 and 2
-Adding edge between 1 and 3
-Adding edge between 1 and 4
-Adding edge between 2 and 5
-Adding edge between 2 and 6
-Running BFS with source 0
-0
-1
-2
-3
-4
-5
-6
-Running BFS with source 1
-1
-0
-3
-4
-2
-5
-6
  */
 
 #include "graphs.h"
 
-void Graphs::DFS(int s, vector<bool> &visited){
+void Graphs::DFSHelper(int source){
+  cout << "Running DFS with source " << source << endl;
 
+  //initialize a bool array to false
+  vector<bool> visited(V, false);
+  this->DFS(source, visited);
+}
+
+void Graphs::DFS(int s, vector<bool> &visited){
+  visited[s] = true;
+  for(list<int> :: iterator itr = Adj[s].begin();
+      itr != Adj[s].end();
+      ++itr)
+  {
+    if(visited[*itr] == false){
+      cout << "Visiting node " << *itr << endl;
+      DFS(*itr, visited);
+    }
+  }
+  return;
 }
 
 void Graphs::BFS(int s){
@@ -104,5 +98,9 @@ int main() {
   //Run BFS with diff nodes
   g.BFS(0);
   g.BFS(1);
+
+  //Run DFS with diff nodes
+  g.DFSHelper(0);
+  g.DFSHelper(1);
 	return 0;
 }
