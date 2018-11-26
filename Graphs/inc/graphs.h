@@ -30,6 +30,7 @@ public:
 
   void BFS(int source);
   void DFS(int source, vector<bool> &visited);
+  void DFSHelper(int source);
   void addedge(int from, int to);
 };
 
