@@ -22,7 +22,26 @@ public:
 
 	void makeset(int x);
 	void makeunion(int x, int y);
-	Node* find(int data);
+
+	Node* DisjointSet::find(int x){
+		Node *parent = nullptr;
+
+		unordered_map<int , Node*> ::iterator itr;
+		itr = hashmap.find(x);
+
+		if(itr != hashmap.end()){
+			parent = itr->second;
+		}
+
+		if(parent->data == x){
+			return parent;
+		}
+		else{
+	        parent = find(parent->data);
+	        hashmap.emplace(x, parent);
+	        return parent;
+		}
+	}
 
 	//constructor
 	DisjointSet(int max){
@@ -65,29 +84,12 @@ void DisjointSet::makeunion(int x, int y){
 	}
 }
 
-
-Node* DisjointSet::find(int x){
-	Node *parent = nullptr;
-
-	unordered_map<int , Node*> ::iterator itr;
-	itr = hashmap.find(x);
-
-	if(itr != hashmap.end()){
-		parent = itr->second;
-	}
-
-	if(parent->data == x){
-		return parent;
-	}
-	else{
-         = find(parent->data);
-	}
-}
 int main() {
 	//make set
 	DisjointSet ud(10);
 
 	//union
-	ud.makeunion();
+	ud.makeunion(1,2);
+	ud.makeunion(3,4);
 	return 0;
 }
