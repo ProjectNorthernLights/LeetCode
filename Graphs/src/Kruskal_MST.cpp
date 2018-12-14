@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ public:
 	}
 
 	//fnc to find Kruskals MST and return weight
-	int K_MST();
+	int K_MST(void);
 
 	//utility function for spot checking the edge weight
 	void edgeWeight(int src, int dest);
@@ -85,7 +86,8 @@ int DisjointSet::find_set(int u){
    itr = disjoint_set.find(u);
 
    if(itr != disjoint_set.end()){
-	   if(itr->second.second == -1)
+	   if(itr->second.second == -1 ||
+		  itr->second.second == u)
 		   return u;
 	   else{
 		   return find_set(itr->second.second);
@@ -114,14 +116,15 @@ void DisjointSet::union_set(int u, int v){
    if(rank_1 == -1 || rank_2 == -1)
 	   return;
 
-   if(rank_1 >= rank_2){
-	   rank_1 = rank_1 + 1;
-	   disjoint_set[u] = make_pair(rank_1, u);
-	   disjoint_set[v] = make_pair(rank_2, u);
-   }else{
+   if(rank_1 > rank_2){
+	   disjoint_set[parent_of_first_elem] = make_pair(rank_1, parent_of_first_elem);
+	   disjoint_set[v] = make_pair(rank_2, parent_of_first_elem);
+   }else if(rank_1 < rank_2){
 	   rank_2++;
-	   disjoint_set[v] = make_pair(rank_2, v);
-	   disjoint_set[u] = make_pair(rank_1, v);
+	   disjoint_set[parent_of_second_elem] = make_pair(rank_2, parent_of_second_elem);
+	   disjoint_set[u] = make_pair(rank_1, parent_of_second_elem);
+   }else{
+      rank_1 = rank_1 + 1;
    }
 
    return;
@@ -138,6 +141,41 @@ void Graph::edgeWeight(int src, int dest){
 		cout << src << "<---->" << dest << " : " << itr->first << endl;
 	  }
 	}
+}
+
+int Graph::K_MST(void){
+
+	DisjointSet ds(V);
+
+	//sort by increasing edge
+	sort(edges.begin(), edges.end());
+
+	int total_weight = 0;
+
+	//for each edge, keep adding to the MST
+	vector<pair<int, pair<int, int>>> :: iterator itr;
+	for(itr = edges.begin(); itr != edges.end(); itr++)
+	{
+	  int u =  itr->second.first;
+	  int v =  itr->second.second;
+
+      int set_x = ds.find_set(u);
+      int set_y = ds.find_set(v);
+
+      cout << u << "Parent is "<< ds.find_set(u) << endl;
+      cout << v << "Parent is "<< ds.find_set(v) << endl;
+      //if belong to same set, then cycle is formed, so avoid cycle
+      if(set_x != set_y)
+      {
+    	cout << u << " - " << v << endl;
+        total_weight = total_weight + itr->first;
+        //merge the two nodes to one set
+        ds.union_set(set_x, set_y);
+      }
+	}
+
+	ds.test_disjoint_set();
+	return total_weight;
 }
 
 int main() {
@@ -167,12 +205,17 @@ int main() {
 
     //Make the DisjointSet to be able to find if the graph
     //has a cycle or not
-    DisjointSet ds(V);
+    //DisjointSet ds(V);
 
     //Check if the DDS is formed correctly
     //ds.test_disjoint_set();
-    ds.union_set(1,2);
+    //ds.union_set(1,2);
     //ds.union_set(2,3);
-    ds.test_disjoint_set();
+    //ds.union_set(1,4);
+    //ds.union_set(4,5);
+    //ds.union_set(5,6);
+    //ds.test_disjoint_set();
+    int wt = g.K_MST();
+    cout << "MST weight " << wt << endl;
 	return 0;
 }
