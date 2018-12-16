@@ -49,7 +49,7 @@ public:
 	  rank = 0;
       for (int i = 0; i < V; i ++ )
       {
-        disjoint_set.emplace(i, make_pair(rank, -1));
+        disjoint_set.emplace(i, make_pair(rank, i));
       }
     }
 
@@ -86,13 +86,17 @@ int DisjointSet::find_set(int u){
    itr = disjoint_set.find(u);
 
    if(itr != disjoint_set.end()){
-	   if(itr->second.second == -1 ||
-		  itr->second.second == u)
+	   if(itr->second.second == u)
+		   //if the parent is the element itself
 		   return u;
 	   else{
-		   return find_set(itr->second.second);
+		   //perform path compression
+		   int interim_parent = find_set(itr->second.second);
+		   disjoint_set[itr->first] = make_pair(itr->second.first, interim_parent);
+		   return interim_parent;
 	   }
    }
+   cout << " Cannot find element in the hashset" << endl;
    return -1;
 }
 
@@ -101,32 +105,34 @@ void DisjointSet::union_set(int u, int v){
    int rank_1 ;
    int rank_2 ;
 
-   int parent_of_first_elem = find_set(u);
-   int parent_of_second_elem = find_set(v);
+   int set_x = find_set(u);
+   int set_y = find_set(v);
 
    //If same, that means they are in same set, return
-   if( parent_of_first_elem == parent_of_second_elem)
+   if( set_x == set_y)
 	   return;
 
    //else Unify by rank
-   rank_1 = find_rank(u);
-   rank_2 = find_rank(v);
+   rank_1 = find_rank(set_x);
+   rank_2 = find_rank(set_y);
 
    //this shouldnt happen
    if(rank_1 == -1 || rank_2 == -1)
 	   return;
 
-   if(rank_1 > rank_2){
-	   disjoint_set[parent_of_first_elem] = make_pair(rank_1, parent_of_first_elem);
-	   disjoint_set[v] = make_pair(rank_2, parent_of_first_elem);
+   if(rank_1 >= rank_2){
+	   disjoint_set[set_y] = make_pair(rank_2, set_x);
    }else if(rank_1 < rank_2){
-	   rank_2++;
-	   disjoint_set[parent_of_second_elem] = make_pair(rank_2, parent_of_second_elem);
-	   disjoint_set[u] = make_pair(rank_1, parent_of_second_elem);
-   }else{
-      rank_1 = rank_1 + 1;
+	   disjoint_set[set_x] = make_pair(rank_1, set_y);
    }
 
+   //Rank is only incremented for one of the sets
+   //if both sets have same rank
+   if(rank_1 == rank_2)
+   {
+     rank_1 = rank_1 + 1;
+     disjoint_set[set_x] = make_pair(rank_1, set_x);
+   }
    return;
 }
 
@@ -162,19 +168,20 @@ int Graph::K_MST(void){
       int set_x = ds.find_set(u);
       int set_y = ds.find_set(v);
 
-      cout << u << "Parent is "<< ds.find_set(u) << endl;
-      cout << v << "Parent is "<< ds.find_set(v) << endl;
+      //Debug msgs
+      //cout << u << "Parent is "<< ds.find_set(u) << endl;
+      //cout << v << "Parent is "<< ds.find_set(v) << endl;
       //if belong to same set, then cycle is formed, so avoid cycle
       if(set_x != set_y)
       {
     	cout << u << " - " << v << endl;
         total_weight = total_weight + itr->first;
         //merge the two nodes to one set
-        ds.union_set(set_x, set_y);
+        ds.union_set(u,v);
       }
 	}
 
-	ds.test_disjoint_set();
+	//ds.test_disjoint_set();
 	return total_weight;
 }
 
@@ -210,8 +217,9 @@ int main() {
     //Check if the DDS is formed correctly
     //ds.test_disjoint_set();
     //ds.union_set(1,2);
-    //ds.union_set(2,3);
-    //ds.union_set(1,4);
+    //ds.union_set(5,6);
+    //ds.union_set(1,5);
+    //ds.union_set(6,7);
     //ds.union_set(4,5);
     //ds.union_set(5,6);
     //ds.test_disjoint_set();
